@@ -1,0 +1,26 @@
+port: 8080
+
+# This connects PowerSync to your native Mac Postgres
+replication:
+  connections:
+    - type: postgresql
+      uri: "postgres://powersync_user:powersync_pass@host.docker.internal:5432/powersync"
+      sslmode: disable
+
+# This points PowerSync to the Go backend we just wrote to verify JWTs
+client_auth:
+  jwks_uri: "http://host.docker.internal:8080/api/auth/keys"
+  audience:
+    - "http://localhost:8081"
+
+sync_rules:
+  content: |
+    bucket_definitions:
+      global:
+        data:
+          - SELECT * FROM todos
+          - SELECT * FROM lists
+
+storage:
+  type: mongodb
+  uri: "mongodb://mongo:27017/powersync"

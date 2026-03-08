@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  powersync:
+    image: journeyapps/powersync-service:latest
+    ports:
+      - "8081:8080" # PowerSync service will be available on 8081 locally
+    environment:
+      # host.docker.internal allows Docker to talk to your Mac's native Postgres!
+      PS_DATA_SOURCE_URI: "postgres://powersync_user:powersync_pass@host.docker.internal:5432/powersync?sslmode=disable"
+    volumes:
+      - ./powersync.yaml:/app/powersync.yaml
+      - ./sync_rules.yaml:/app/sync_rules.yaml
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    command: ["--replSet", "rs0", "--bind_ip_all"]

@@ -1,0 +1,5 @@
+bucket_definitions:
+  global:
+    data:
+      - SELECT * FROM todos
+      - SELECT * FROM lists
