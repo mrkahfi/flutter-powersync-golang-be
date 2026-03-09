@@ -6,6 +6,7 @@ replication:
     - type: postgresql
       uri: "postgres://powersync_user:powersync_pass@host.docker.internal:5432/powersync"
       sslmode: disable
+      poll_interval_ms: 100
 
 # This points PowerSync to the Go backend we just wrote to verify JWTs
 client_auth:
