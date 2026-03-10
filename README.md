@@ -18,9 +18,9 @@ manual refresh needed.
 │  (port 8080)        │                          │   (port 5432)        │
 └─────────────────────┘                          └──────────────────────┘
                                                  ┌──────────────────────┐
-                                                 │  MongoDB             │
-                                                 │  (Docker, port 27017)│
-                                                 │  (PowerSync internal)│
+                                                 │  Internal Storage    │
+                                                 │  (Managed by Docker) │
+                                                 │  (PowerSync engine)  │
                                                  └──────────────────────┘
 ```
 
@@ -28,8 +28,8 @@ manual refresh needed.
   API). Runs natively on the host.
 - **PowerSync service** — watches the Postgres WAL for changes and streams them
   to connected Flutter clients. Runs in Docker.
-- **MongoDB** — used internally by the PowerSync service only (you don't
-  interact with it directly).
+- **Internal Storage** — a MongoDB instance managed by Docker and used
+  exclusively by the PowerSync service for sync metadata.
 - **PostgreSQL** — the source of truth. Runs natively on the host.
 - **Flutter app** — maintains a local SQLite replica, updated in realtime via
   PowerSync.
@@ -44,7 +44,7 @@ manual refresh needed.
 | Dart SDK       | ≥ 3.8.1 | Comes with Flutter                            |
 | Go             | ≥ 1.21  | Only needed to **rebuild** the backend binary |
 | PostgreSQL     | ≥ 14    | Must be running natively (not in Docker)      |
-| Docker Desktop | Latest  | For PowerSync service + MongoDB               |
+| Docker Desktop | Latest  | For PowerSync service infrastructure          |
 
 ---
 
@@ -86,7 +86,7 @@ manual migration needed.
 
 ---
 
-## 2 — Docker Setup (PowerSync + MongoDB)
+## 2 — Docker Setup (PowerSync)
 
 ```bash
 # From the project root
@@ -98,7 +98,7 @@ Verify containers are running:
 
 ```bash
 docker ps
-# You should see: server-powersync-1 and server-mongo-1
+# You should see the PowerSync and storage containers running
 ```
 
 > **Note:** The `version` field warning in docker-compose.yml output is harmless
@@ -268,7 +268,7 @@ curl 'http://localhost:8080/api/auth/token?user_id=dev-user-001'  # Auth token
 Always start components in this order:
 
 1. **PostgreSQL** (must already be running)
-2. **Docker Desktop** → then `docker compose up -d` (PowerSync + MongoDB)
+2. **Docker Desktop** → then `docker compose up -d` (PowerSync infrastructure)
 3. **Go backend** → `./powersync-backend` with env vars
 4. **Flutter app** → `flutter run`
 
@@ -294,7 +294,7 @@ flutter_powersync/
 │   ├── config/config.go         # Environment variable loading
 │   ├── powersync.yaml           # PowerSync service config
 │   ├── sync_rules.yaml          # Which tables get synced to clients
-│   ├── docker-compose.yml       # PowerSync service + MongoDB
+│   ├── docker-compose.yml       # PowerSync service infrastructure
 │   ├── .env.example             # Template for environment variables
 │   ├── Makefile                 # Shortcuts: make run, make build, make keys
 │   └── powersync-backend        # Pre-built binary
@@ -310,10 +310,10 @@ all rows from both tables are sent to all users (global bucket):
 
 ```yaml
 bucket_definitions:
-    global:
-        data:
-            - SELECT * FROM todos
-            - SELECT * FROM lists
+  global:
+    data:
+      - SELECT * FROM todos
+      - SELECT * FROM lists
 ```
 
 To scope data per user (e.g. only sync a user's own todos), update this file and
@@ -321,11 +321,11 @@ restart the PowerSync Docker container:
 
 ```yaml
 bucket_definitions:
-    by_user:
-        parameters: SELECT token_parameters.user_id
-        data:
-            - SELECT * FROM todos WHERE created_by = bucket.user_id
-            - SELECT * FROM lists WHERE created_by = bucket.user_id
+  by_user:
+    parameters: SELECT token_parameters.user_id
+    data:
+      - SELECT * FROM todos WHERE created_by = bucket.user_id
+      - SELECT * FROM lists WHERE created_by = bucket.user_id
 ```
 
 ---
