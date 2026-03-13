@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import 'database/powersync.dart';
 import 'models/todo.dart';
 import 'models/todo_list.dart';
+import 'map_screen.dart';
 
 const _uuid = Uuid();
 
@@ -111,8 +112,17 @@ class ListsScreen extends StatelessWidget {
           'My Lists',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        actions: const [
-          Padding(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.map_rounded),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const MapScreen()),
+              );
+            },
+          ),
+          const Padding(
             padding: EdgeInsets.only(right: 12),
             child: _SyncStatusBadge(),
           ),
