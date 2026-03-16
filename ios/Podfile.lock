@@ -7,10 +7,11 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - powersync-sqlite-core (0.1.8)
+  - powersync-sqlite-core (0.4.11)
   - powersync_flutter_libs (0.0.1):
     - Flutter
-    - powersync-sqlite-core (~> 0.1.6)
+    - FlutterMacOS
+    - powersync-sqlite-core (~> 0.4.11)
   - sqlite3 (3.52.0):
     - sqlite3/common (= 3.52.0)
   - sqlite3/common (3.52.0)
@@ -41,7 +42,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - maplibre_gl (from `.symlinks/plugins/maplibre_gl/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
-  - powersync_flutter_libs (from `.symlinks/plugins/powersync_flutter_libs/ios`)
+  - powersync_flutter_libs (from `.symlinks/plugins/powersync_flutter_libs/darwin`)
   - sqlite3_flutter_libs (from `.symlinks/plugins/sqlite3_flutter_libs/darwin`)
 
 SPEC REPOS:
@@ -58,7 +59,7 @@ EXTERNAL SOURCES:
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   powersync_flutter_libs:
-    :path: ".symlinks/plugins/powersync_flutter_libs/ios"
+    :path: ".symlinks/plugins/powersync_flutter_libs/darwin"
   sqlite3_flutter_libs:
     :path: ".symlinks/plugins/sqlite3_flutter_libs/darwin"
 
@@ -67,8 +68,8 @@ SPEC CHECKSUMS:
   MapLibre: 7f24faba45439f80ccb0f83393c29fa32cb81952
   maplibre_gl: d83126f1b19adee5e1071c453b421efd5fc99883
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
-  powersync-sqlite-core: 9325150c88515df0b5ea992007708588c3f01518
-  powersync_flutter_libs: ce440e3eb7e556f0614be6cd0efdbd0cc363191d
+  powersync-sqlite-core: aae0128de5f062c8e5a6bc450090ebba0b398222
+  powersync_flutter_libs: 20381b877038d27d8fa918f8c3fff08bfc3925d0
   sqlite3: a51c07cf16e023d6c48abd5e5791a61a47354921
   sqlite3_flutter_libs: b3e120efe9a82017e5552a620f696589ed4f62ab
 

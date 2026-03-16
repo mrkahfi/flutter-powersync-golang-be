@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Map tile data (large binary — download separately)
+assets/map/tiles.pmtiles
