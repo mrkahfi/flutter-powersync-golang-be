@@ -72,6 +72,10 @@ flutter:
   assets:
     - assets/map/style.json
     - assets/map/tiles.mbtiles
+    - assets/map/sprites/
+    - assets/map/fonts/Noto Sans Regular/
+    - assets/map/fonts/Noto Sans Bold/
+    - assets/map/fonts/Noto Sans Italic/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'local_asset_server.dart';
+
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
 
@@ -20,7 +22,7 @@ class _MapScreenState extends State<MapScreen> {
 
   static const _initial = CameraPosition(
     target: LatLng(-7.550550, 110.748135),
-    zoom: 12,
+    zoom: 16,
   );
 
   @override
@@ -31,6 +33,8 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _initOfflineMap() async {
     try {
+      await LocalAssetServer.start();
+
       final docsDir = await getApplicationDocumentsDirectory();
       final mbtilesPath = '${docsDir.path}/tiles.mbtiles';
       final file = File(mbtilesPath);
@@ -47,13 +51,21 @@ class _MapScreenState extends State<MapScreen> {
       // Re-copy if file size differs (picks up asset updates between runs)
       final localSize = await file.exists() ? await file.length() : -1;
       if (localSize != assetSize) {
-        final bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+        final bytes = data.buffer.asUint8List(
+          data.offsetInBytes,
+          data.lengthInBytes,
+        );
         await file.writeAsBytes(bytes, flush: true);
       }
 
       // Load style and inject the local mbtiles path
-      final styleJsonString = await rootBundle.loadString('assets/map/style.json');
-      final updatedStyle = styleJsonString.replaceAll('{path_to_mbtiles}', mbtilesPath);
+      final styleJsonString = await rootBundle.loadString(
+        'assets/map/style.json',
+      );
+      final updatedStyle = styleJsonString.replaceAll(
+        '{path_to_mbtiles}',
+        mbtilesPath,
+      );
 
       setState(() => _localStyleString = updatedStyle);
     } catch (e) {
@@ -83,41 +95,42 @@ class _MapScreenState extends State<MapScreen> {
       body: _localStyleString == null
           ? const Center(child: CircularProgressIndicator())
           : _localStyleString == 'ERROR_EMPTY_MBTILES'
-              ? const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(32.0),
-                    child: Text(
-                      'Map cannot load: assets/map/tiles.mbtiles is empty.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.redAccent, fontSize: 16),
+          ? const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32.0),
+                child: Text(
+                  'Map cannot load: assets/map/tiles.mbtiles is empty.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.redAccent, fontSize: 16),
+                ),
+              ),
+            )
+          : Stack(
+              children: [
+                MapLibreMap(
+                  styleString: _localStyleString!,
+                  initialCameraPosition: _initial,
+                  onMapCreated: (c) => _controllerCompleter.complete(c),
+                  onStyleLoadedCallback: () =>
+                      setState(() => _styleLoaded = true),
+                  myLocationEnabled: true,
+                ),
+                if (_styleLoaded)
+                  Positioned(
+                    right: 16,
+                    bottom: 100,
+                    child: Column(
+                      children: [
+                        _MapButton(icon: Icons.add, onTap: _zoomIn),
+                        const SizedBox(height: 8),
+                        _MapButton(icon: Icons.remove, onTap: _zoomOut),
+                        const SizedBox(height: 8),
+                        _MapButton(icon: Icons.explore_rounded, onTap: _goHome),
+                      ],
                     ),
                   ),
-                )
-              : Stack(
-                  children: [
-                    MapLibreMap(
-                      styleString: _localStyleString!,
-                      initialCameraPosition: _initial,
-                      onMapCreated: (c) => _controllerCompleter.complete(c),
-                      onStyleLoadedCallback: () => setState(() => _styleLoaded = true),
-                      myLocationEnabled: true,
-                    ),
-                    if (_styleLoaded)
-                      Positioned(
-                        right: 16,
-                        bottom: 100,
-                        child: Column(
-                          children: [
-                            _MapButton(icon: Icons.add, onTap: _zoomIn),
-                            const SizedBox(height: 8),
-                            _MapButton(icon: Icons.remove, onTap: _zoomOut),
-                            const SizedBox(height: 8),
-                            _MapButton(icon: Icons.explore_rounded, onTap: _goHome),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
+              ],
+            ),
     );
   }
 }

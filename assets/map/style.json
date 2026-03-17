@@ -6,8 +6,8 @@
       "url": "mbtiles://{path_to_mbtiles}"
     }
   },
-  "sprite": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm",
-  "glyphs": "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
+  "sprite": "http://127.0.0.1:8080/assets/map/sprites/ofm",
+  "glyphs": "http://127.0.0.1:8080/assets/map/fonts/{fontstack}/{range}.pbf",
   "layers": [
     {
       "id": "background",
