@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.flutter_powersync"
     compileSdk = 36
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "28.1.13356709"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
