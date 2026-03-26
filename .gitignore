@@ -46,3 +46,9 @@ app.*.map.json
 
 # Map tile data (large binary — download separately)
 assets/map/tiles.pmtiles
+assets/map/*.zip
+assets/map/solo-shp/
+
+# Go compiled binaries
+server/server
+
