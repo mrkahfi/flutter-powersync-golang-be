@@ -6,8 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'local_asset_server.dart';
-
+import 'package:archive/archive.dart';
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
 
@@ -33,7 +32,6 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _initOfflineMap() async {
     try {
-      await LocalAssetServer.start();
 
       final docsDir = await getApplicationDocumentsDirectory();
       final mbtilesPath = '${docsDir.path}/tiles.mbtiles';
@@ -58,14 +56,32 @@ class _MapScreenState extends State<MapScreen> {
         await file.writeAsBytes(bytes, flush: true);
       }
 
+      // Extract map assets zip to local storage
+      final zipDir = Directory('${docsDir.path}/map_assets');
+      if (!await zipDir.exists()) {
+        final zipData = await rootBundle.load('assets/map/map_assets.zip');
+        final bytes = zipData.buffer.asUint8List();
+        final archive = ZipDecoder().decodeBytes(bytes);
+        for (final file in archive) {
+          final filename = file.name;
+          if (file.isFile) {
+            final data = file.content as List<int>;
+            final outFile = File('${zipDir.path}/$filename');
+            await outFile.create(recursive: true);
+            await outFile.writeAsBytes(data);
+          } else {
+            await Directory('${zipDir.path}/$filename').create(recursive: true);
+          }
+        }
+      }
+
       // Load style and inject the local mbtiles path
       final styleJsonString = await rootBundle.loadString(
         'assets/map/style.json',
       );
-      final updatedStyle = styleJsonString.replaceAll(
-        '{path_to_mbtiles}',
-        mbtilesPath,
-      );
+      final updatedStyle = styleJsonString
+          .replaceAll('{path_to_mbtiles}', mbtilesPath)
+          .replaceAll('{path_to_assets}', zipDir.path);
 
       setState(() => _localStyleString = updatedStyle);
     } catch (e) {

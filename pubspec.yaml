@@ -41,7 +41,7 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.41
   maplibre_gl: ^0.24.1
   pmtiles: ^1.3.0
-  shelf: ^1.4.2
+  archive: ^3.6.1
 
 dependency_overrides:
   powersync_core: 1.7.0
@@ -72,10 +72,7 @@ flutter:
   assets:
     - assets/map/style.json
     - assets/map/tiles.mbtiles
-    - assets/map/sprites/
-    - assets/map/fonts/Noto Sans Regular/
-    - assets/map/fonts/Noto Sans Bold/
-    - assets/map/fonts/Noto Sans Italic/
+    - assets/map/map_assets.zip
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -49,4 +49,20 @@ print(f"Starting {len(tasks)} downloads...")
 with ThreadPoolExecutor(max_workers=30) as executor:
     for url, path in tasks:
         executor.submit(download_file, url, path)
-print("Done downloading assets.")
+
+import shutil
+
+print("Compressing sprites and fonts into map_assets.zip...")
+# Create map_assets.zip containing sprites and fonts
+shutil.make_archive(
+    os.path.join(BASE_DIR, "map_assets"), 
+    "zip", 
+    BASE_DIR, 
+    "."
+)
+
+print("Cleaning up uncompressed directories...")
+shutil.rmtree(SPRITE_DIR)
+shutil.rmtree(FONT_DIR)
+
+print("Done downloading and compressing offline assets into map_assets.zip!")

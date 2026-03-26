@@ -64,7 +64,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/sqlite3_flutter_libs/darwin"
 
 SPEC CHECKSUMS:
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   MapLibre: 7f24faba45439f80ccb0f83393c29fa32cb81952
   maplibre_gl: d83126f1b19adee5e1071c453b421efd5fc99883
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564

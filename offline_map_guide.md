@@ -15,14 +15,27 @@ Our offline map solution relies on MapLibre GL and is composed of three main loc
 
 ### 2. Styling Assets (Fonts & Sprites)
 MapLibre requires fonts (glyphs) to render text like street names, and sprites to render icons like park trees or hospital crosses.
-- **Where they live:** `assets/map/fonts/` and `assets/map/sprites/`.
-- **How it works:** Due to a known limitation in the MapLibre engine regarding `asset://` resolution (specifically dealing with URL-encoded spaces in font names), we use a custom `LocalAssetServer`.
-- **`LocalAssetServer`:** Runs on `http://127.0.0.1:8080` internally within the app and intercepts HTTP requests for fonts and sprites, seamlessly serving the local assets without ever hitting the internet.
+- **Where they live:** Bundled as `assets/map/map_assets.zip`.
+- **How it works:** Due to strict Android and MapLibre offline network constraints, we cannot rely on local HTTP interceptors. On first load, the app extracts `map_assets.zip` directly into the device's document directory alongside the `mbtiles`. 
 
 ### 3. Style Theme (`style.json`)
 - **What it is:** The JSON configuration dictates the visual look of the map (colors, layer visibility, what fonts to use).
 - **Where it lives:** `assets/map/style.json`.
-- **How it works:** Loaded at runtime. The app dynamically replaces `{path_to_mbtiles}` with the absolute path of the copied `MBTiles` file, and points all font/sprite requests to `http://127.0.0.1:8080`.
+- **How it works:** Loaded at runtime. The app dynamically replaces `{path_to_mbtiles}` and `{path_to_assets}` with the absolute paths of the local files. MapLibre then loads the fonts and sprites securely via `file:///` URIs, ensuring 100% offline reliability.
+
+---
+
+## 🎨 Managing Fonts & Sprites (Map Assets)
+
+To change the fonts, upgrade the icons, or update visual theme components, you don't need to manually touch the 700+ `.pbf` font files. 
+
+We provide an automated Python utility located at the root of the repository: `download_offline_assets.py`.
+
+**How to use:**
+1. Update the hardcoded `sprite_urls` or `fonts` arrays inside `download_offline_assets.py` to point to your new theme.
+2. Run the script: `python3 download_offline_assets.py`
+3. The script will automatically fetch thousands of code-points, compress them precisely into the unified `assets/map/map_assets.zip` file, and delete the raw tracking directories—keeping your workspace clean.
+4. Rebuild the app!
 
 ---
 
@@ -73,4 +86,4 @@ If you want to drastically reduce the app bundle size by removing the offline ma
 
 *   **Map displays grid lines but no data:** The `mbtiles` file does not contain data for the current coordinates/current zoom level. Ensure your initial camera position is within the actual territory boundary.
 *   **"Map cannot load" banner:** This means the local `mbtiles` file successfully copied, but it has 0 bytes. Ensure the asset is valid.
-*   **Text/Icons missing:** The `LocalAssetServer` failed to start or `style.json` is missing the `127.0.0.1:8080` prefix. Ensure your port is not colliding.
+*   **Blank Map (No background/street lines):** If MapLibre cannot find the local sprites or glyphs, it will completely abort rendering the map style. Ensure `map_assets.zip` is correctly bundled in `pubspec.yaml` and is non-empty.
