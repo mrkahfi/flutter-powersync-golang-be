@@ -7,6 +7,7 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:archive/archive.dart';
+
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
 
@@ -32,7 +33,6 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _initOfflineMap() async {
     try {
-
       final docsDir = await getApplicationDocumentsDirectory();
       final mbtilesPath = '${docsDir.path}/tiles.mbtiles';
       final file = File(mbtilesPath);
@@ -99,9 +99,29 @@ class _MapScreenState extends State<MapScreen> {
     await c.animateCamera(CameraUpdate.zoomOut());
   }
 
-  Future<void> _goHome() async {
+  static const _jakartaPos = CameraPosition(
+    target: LatLng(-6.2088, 106.8456),
+    zoom: 12,
+  );
+
+  static const _surabayaPos = CameraPosition(
+    target: LatLng(-7.2575, 112.7521),
+    zoom: 12,
+  );
+
+  Future<void> _goToSolo() async {
     final c = await _controllerCompleter.future;
     await c.animateCamera(CameraUpdate.newCameraPosition(_initial));
+  }
+
+  Future<void> _goToSurabaya() async {
+    final c = await _controllerCompleter.future;
+    await c.animateCamera(CameraUpdate.newCameraPosition(_surabayaPos));
+  }
+
+  Future<void> _goToJakarta() async {
+    final c = await _controllerCompleter.future;
+    await c.animateCamera(CameraUpdate.newCameraPosition(_jakartaPos));
   }
 
   @override
@@ -131,7 +151,105 @@ class _MapScreenState extends State<MapScreen> {
                       setState(() => _styleLoaded = true),
                   myLocationEnabled: true,
                 ),
-                if (_styleLoaded)
+                if (_styleLoaded) ...[
+                  Positioned(
+                    top: 16,
+                    left: 24,
+                    right: 24,
+                    child: SafeArea(
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(32),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextButton.icon(
+                                onPressed: _goToJakarta,
+                                icon: const Icon(
+                                  Icons.location_city,
+                                  color: Colors.black87,
+                                ),
+                                label: const Text(
+                                  'Jakarta',
+                                  style: TextStyle(color: Colors.black87),
+                                ),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(28),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 1,
+                              height: 24,
+                              color: Colors.grey.shade300,
+                            ),
+                            Expanded(
+                              child: TextButton.icon(
+                                onPressed: _goToSolo,
+                                icon: const Icon(
+                                  Icons.home,
+                                  color: Colors.black87,
+                                ),
+                                label: const Text(
+                                  'Solo',
+                                  style: TextStyle(color: Colors.black87),
+                                ),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(28),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 1,
+                              height: 24,
+                              color: Colors.grey.shade300,
+                            ),
+                            Expanded(
+                              child: TextButton.icon(
+                                onPressed: _goToSurabaya,
+                                icon: const Icon(
+                                  Icons.home,
+                                  color: Colors.black87,
+                                ),
+                                label: const Text(
+                                  'Surabaya',
+                                  style: TextStyle(color: Colors.black87),
+                                ),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(28),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                   Positioned(
                     right: 16,
                     bottom: 100,
@@ -140,11 +258,10 @@ class _MapScreenState extends State<MapScreen> {
                         _MapButton(icon: Icons.add, onTap: _zoomIn),
                         const SizedBox(height: 8),
                         _MapButton(icon: Icons.remove, onTap: _zoomOut),
-                        const SizedBox(height: 8),
-                        _MapButton(icon: Icons.explore_rounded, onTap: _goHome),
                       ],
                     ),
                   ),
+                ],
               ],
             ),
     );
