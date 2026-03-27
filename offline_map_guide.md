@@ -79,6 +79,7 @@ need a new `.mbtiles` file.
 
 **Step 1: Obtain a new `mbtiles` file.**
 
+- **Custom Extracts (Recommended):** Use the [BBBike Extract Service](https://extract.bbbike.org/). Search for your target area, draw a bounding box, and select a Vector `.mbtiles` format (e.g. OpenMapTiles schema).
 - **Generate from OpenStreetMap:** You can use tools like
   [Tilemaker](https://tilemaker.org/) or
   [Planetiler](https://github.com/onthegomap/planetiler) to parse `.osm.pbf`
@@ -103,10 +104,11 @@ If you want the map to work offline for _multiple distinct regions_ (e.g.,
 Jakarta AND Surabaya) without downloading the entire planet (which is ~100GB+),
 you must **merge** them into a single `mbtiles` file.
 
-**Tools for Merging:**
+**Step 1: Obtain Individual Regions:**
+For example, use the [BBBike Extract Service](https://extract.bbbike.org/) to repeatedly download separate `.mbtiles` files for each specific territory you need.
 
-- **[tippecanoe](https://github.com/felt/tippecanoe):** Contains a utility tool
-  called `tile-join` specifically designed for this purpose.
+**Step 2: Merge the regions:**
+Use **[tippecanoe](https://github.com/felt/tippecanoe)**, which contains a utility tool called `tile-join` specifically designed for this purpose.
   ```bash
   tile-join -o combined_tiles.mbtiles region1.mbtiles region2.mbtiles
   ```
